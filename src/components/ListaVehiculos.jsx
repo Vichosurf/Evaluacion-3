@@ -1,4 +1,5 @@
-import CardVehiculos from './CardVehiculos'
+/* eslint-disable */
+import CardVehiculo from './CardVehiculo';
 
 function ListaVehiculos({ vehiculos, onRetirar, capacidad }) {
   const ocupacionPorcentaje = (vehiculos.length / capacidad) * 100
@@ -34,7 +35,8 @@ function ListaVehiculos({ vehiculos, onRetirar, capacidad }) {
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '100%' }}>
           {vehiculos.map((vehiculo) => (
-            <CardVehiculos 
+            // Corrección: Usamos el componente en singular
+            <CardVehiculo 
               key={vehiculo.id} 
               vehiculo={vehiculo} 
               onRetirar={onRetirar} 

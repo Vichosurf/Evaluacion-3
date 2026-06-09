@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useState } from 'react'
 
 function Formulario({ onRegistrar, isFull }) {

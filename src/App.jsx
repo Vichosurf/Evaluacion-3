@@ -3,69 +3,47 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
-import Formulario from './components/Formulario'
-import ListaVehiculos from './components/ListaVehiculos'
+
+// CAMBIO AQUÍ: Aseguramos las extensiones .jsx explicitamente
+import Formulario from './components/Formulario.jsx'
+import ListaVehiculos from './components/ListaVehiculos.jsx'
 import './App.css'
 
-/* Definimos la capacidad máxima del estacionamiento */
 const CAPACIDAD_MAXIMA = 10;
 
 function App() {
-  // Estado para contar los movimientos/operaciones totales del sistema
   const [count, setCount] = useState(0)
 
-  // Estado del Sistema de Estacionamientos
   const [vehiculos, setVehiculos] = useState(() => {
-    try {
-      const datosAlmacenados = localStorage.getItem('estacionamiento_vehiculos')
-      return datosAlmacenados ? JSON.parse(datosAlmacenados) : []
-    } catch (error) {
-      console.error("Error cargando LocalStorage", error)
-      return []
-    }
+    const datosAlmacenados = localStorage.getItem('estacionamiento_vehiculos')
+    if (datosAlmacenados) return JSON.parse(datosAlmacenados)
+    return [
+      { id: crypto.randomUUID(), patente: 'ABC123', tipo: 'Auto', hora: '08:00' },
+      { id: crypto.randomUUID(), patente: 'XYZ789', tipo: 'Moto', hora: '09:30' },
+      { id: crypto.randomUUID(), patente: 'DEF456', tipo: 'Camioneta', hora: '10:15' }
+    ]
   })
 
-  // Simulación de Consumo Asíncrono de Datos (Para cumplir rúbrica punto 3)
-  useEffect(() => {
-    if (vehiculos.length === 0) {
-      const cargarDatosIniciales = async () => {
-        // Simulamos una demora de red
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const datosIniciales = [
-          { id: crypto.randomUUID(), patente: 'ABC123', tipo: 'Auto', hora: '08:00' },
-          { id: crypto.randomUUID(), patente: 'XYZ789', tipo: 'Moto', hora: '09:30' },
-          { id: crypto.randomUUID(), patente: 'DEF456', tipo: 'Camioneta', hora: '10:15' }
-        ];
-        setVehiculos(datosIniciales);
-      };
-      cargarDatosIniciales();
-    }
-  }, []); // Solo al montar el componente
-
-  // Sincronizar automáticamente con LocalStorage cuando cambie el estado
   useEffect(() => {
     localStorage.setItem('estacionamiento_vehiculos', JSON.stringify(vehiculos))
   }, [vehiculos])
 
-  // Lógica para registrar un ingreso
   const registrarVehiculo = (nuevoVehiculo) => {
     if (vehiculos.length >= CAPACIDAD_MAXIMA) {
       alert('El estacionamiento está lleno.')
       return
     }
     setVehiculos((prev) => [...prev, { ...nuevoVehiculo, id: crypto.randomUUID() }])
-    setCount((prev) => prev + 1) // Eliminada línea azul por shadowing
+    setCount((prev) => prev + 1)
   }
 
-  // Lógica para registrar una salida
   const retirarVehiculo = (id) => {
     setVehiculos((prev) => prev.filter((vehiculo) => vehiculo.id !== id))
-    setCount((prev) => prev + 1) // Eliminada línea azul por shadowing
+    setCount((prev) => prev + 1)
   }
 
   return (
     <>
-      {/* SECCIÓN CENTRAL */}
       <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
@@ -80,24 +58,22 @@ function App() {
           </p>
         </div>
 
-        {/* Componentes del Sistema Integrados */}
         <div className="app-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', textAlign: 'left', marginBottom: '24px' }}>
           <Formulario onRegistrar={registrarVehiculo} isFull={vehiculos.length >= CAPACIDAD_MAXIMA} />
           <ListaVehiculos vehiculos={vehiculos} onRetirar={retirarVehiculo} capacidad={CAPACIDAD_MAXIMA} />
         </div>
 
-        {/* Botón original integrado como un contador de auditoría */}
-        <div
+        <button
+          type="button"
           className="counter"
-          style={{ display: 'inline-block', cursor: 'default' }}
+          onClick={() => setCount((prev) => prev + 1)}
         >
           Operaciones registradas: {count}
-        </div>
+        </button>
       </section>
 
       <div className="ticks"></div>
 
-      {/* SECCIÓN INFERIOR */}
       <section id="next-steps">
         <div id="docs">
           <svg className="icon" role="presentation" aria-hidden="true">
