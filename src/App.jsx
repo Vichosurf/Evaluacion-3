@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
@@ -11,16 +10,24 @@ import './App.css'
 
 const CAPACIDAD_MAXIMA = 10;
 
+// Función para generar IDs únicos de forma segura
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2, 9);
+};
+
 function App() {
   const [count, setCount] = useState(0)
 
   const [vehiculos, setVehiculos] = useState(() => {
-    const datosAlmacenados = localStorage.getItem('estacionamiento_vehiculos')
-    if (datosAlmacenados) return JSON.parse(datosAlmacenados)
+    const datos = localStorage.getItem('estacionamiento_vehiculos')
+    if (datos) return JSON.parse(datos)
     return [
-      { id: crypto.randomUUID(), patente: 'ABC123', tipo: 'Auto', hora: '08:00' },
-      { id: crypto.randomUUID(), patente: 'XYZ789', tipo: 'Moto', hora: '09:30' },
-      { id: crypto.randomUUID(), patente: 'DEF456', tipo: 'Camioneta', hora: '10:15' }
+      { id: generateId(), patente: 'ABC123', tipo: 'Auto', hora: '08:00' },
+      { id: generateId(), patente: 'XYZ789', tipo: 'Moto', hora: '09:30' },
+      { id: generateId(), patente: 'DEF456', tipo: 'Camioneta', hora: '10:15' }
     ]
   })
 
@@ -33,43 +40,42 @@ function App() {
       alert('El estacionamiento está lleno.')
       return
     }
-    setVehiculos((prev) => [...prev, { ...nuevoVehiculo, id: crypto.randomUUID() }])
+    setVehiculos((prev) => [...prev, { ...nuevoVehiculo, id: generateId() }])
     setCount((prev) => prev + 1)
   }
 
   const retirarVehiculo = (id) => {
     setVehiculos((prev) => prev.filter((vehiculo) => vehiculo.id !== id))
-    setCount((prev) => prev + 1)
+    setCount((c) => c + 1)
   }
 
   return (
     <>
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
+          <img src={heroImg} className="base" width="170" height="179" alt="Hero" />
           <img src={reactLogo} className="framework" alt="React logo" />
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
         
-        <div style={{ marginBottom: '24px' }}>
+        <div className="header-text">
           <h1>Control de Estacionamientos</h1>
           <p>
             Registro de flujos vehiculares, ocupación en tiempo real y almacenamiento local permanente.
           </p>
         </div>
 
-        <div className="app-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', textAlign: 'left', marginBottom: '24px' }}>
+        <div className="app-content">
           <Formulario onRegistrar={registrarVehiculo} isFull={vehiculos.length >= CAPACIDAD_MAXIMA} />
           <ListaVehiculos vehiculos={vehiculos} onRetirar={retirarVehiculo} capacidad={CAPACIDAD_MAXIMA} />
         </div>
 
-        <button
-          type="button"
+        <div
           className="counter"
-          onClick={() => setCount((prev) => prev + 1)}
+          style={{ cursor: 'default' }}
         >
           Operaciones registradas: {count}
-        </button>
+        </div>
       </section>
 
       <div className="ticks"></div>
